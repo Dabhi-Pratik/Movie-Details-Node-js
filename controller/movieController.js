@@ -43,13 +43,13 @@ const getMovieById = async (req, res, next) => {
     try {
         const id = req.params.id
 
-        const movie = await movie.findById(id)
+        const foundMovie = await movie.findById(id)
 
-        if (!movie) {
+        if (!foundMovie) {
             return next(new HttpError("Movie not Found..!", 404))
         }
 
-        res.status(200).json({ message: "get movie Successfully", movie })
+        res.status(200).json({ message: "get movie Successfully", foundMovie })
 
 
     } catch (error) {
@@ -61,17 +61,17 @@ const deleteMovie = async (req, res, next) => {
     try {
         const id = req.params.id;
 
-        const movie = await movie.findById(id);
+        const foundMovie = await movie.findById(id);
 
-        if (!movie) {
+        if (!foundMovie) {
             return next(new HttpError("Movie not found", 404));
         }
 
-        await cloudinary.uploader.destroy(movie.cloudinary_id)
+        await cloudinary.uploader.destroy(foundMovie.cloudinary_id)
 
-        await movie.deleteOne()
+        await foundMovie.deleteOne()
 
-        res.status(200).json({ message: "Movie Delete Successfully..!", movie });
+        res.status(200).json({ message: "Movie Delete Successfully..!", foundMovie });
     } catch (error) {
         next(new HttpError("Invalid movie ID", 400));
     }
@@ -82,9 +82,9 @@ const updateMovie = async (req, res, next) => {
 
         const id = req.params.id
 
-        const movie = await movie.findById(id)
+        const foundMovie = await movie.findById(id)
 
-        if (!movie) {
+        if (!foundMovie) {
             return next(new HttpError("movie not found", 404))
         }
 
@@ -101,22 +101,22 @@ const updateMovie = async (req, res, next) => {
         }
 
         update.forEach((field) => {
-            movie[field] = req.body[field]
+            foundMovie[field] = req.body[field]
         })
 
         if (req.file) {
-            await cloudinary.uploader.destroy(movie.cloudinary_id)
+            await cloudinary.uploader.destroy(foundMovie.cloudinary_id)
 
-            movie.poster = req.file.path
-            movie.cloudinary_id = req.file.filename
+            foundMovie.poster = req.file.path
+            foundMovie.cloudinary_id = req.file.filename
         }
 
-        await movie.save()
+        await foundMovie.save()
 
         res.status(200).json({
             success: true,
             message: "movie Updated Successfully",
-            movie
+            foundMovie
         })
 
     } catch (error) {
