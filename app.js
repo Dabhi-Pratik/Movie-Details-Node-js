@@ -1,44 +1,44 @@
-    import express from "express"
-    import cors from "cors"
-    import dotenv from "dotenv"
-    import connectDb from "./config/db.js"
-    import router from "./router/movieRouter.js"
-    import HttpError from "./middleware/HttpError.js"
+import express from "express"
+import cors from "cors"
+import dotenv from "dotenv"
+import connectDb from "./config/db.js"
+import router from "./router/movieRouter.js"
+import HttpError from "./middleware/HttpError.js"
 
-    dotenv.config({ path: "./env" })
+dotenv.config()
 
-    const app = express()
+const app = express()
 
-    app.use(cors())
-    app.use(express.json());
+app.use(cors())
+app.use(express.json());
 
-    app.use("/movie", router);
+app.use("/movie", router);
 
-    console.log(process.env.MONGO_URI);
+console.log(process.env.MONGO_URI);
 
-    app.get("/", (req, res) => {
-        res.status(200).json("hello from server");
-    });
+app.get("/", (req, res) => {
+    res.status(200).json("hello from server");
+});
 
-    // undefined routes
+// undefined routes
 
-    app.use((req, res, next) => {
-        next(new HttpError("requested route not found", 404));
-    });
+app.use((req, res, next) => {
+    next(new HttpError("requested route not found", 404));
+});
 
-    app.use((error, req, res, next) => {
-        if (res.headersSent) {
-            next(error);
-        }
+app.use((error, req, res, next) => {
+    if (res.headersSent) {
+        next(error);
+    }
 
-        res
-            .status(error.statusCode || 500)
-            .json({ message: error.message || "internal server error" });
-    });
+    res
+        .status(error.statusCode || 500)
+        .json({ message: error.message || "internal server error" });
+});
 
-    const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000
 
-   async function startServer() {
+async function startServer() {
     try {
         await connectDb();
         app.listen(port, () => {
@@ -51,4 +51,4 @@
 }
 
 
-    startServer();
+startServer();
